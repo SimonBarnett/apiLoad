@@ -1,0 +1,12 @@
+{
+  "name": "api-handler",
+  "version": "0.0.0",
+  "description": "apiHandler",
+  "main": "server.js",
+  "author": {
+    "name": "Administrator"
+  },
+  "dependencies": {
+    "priority-web-sdk": "^1.5.13"
+  }
+}
