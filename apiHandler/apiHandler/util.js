@@ -3,8 +3,7 @@
     qs = require('querystring'),
     url = require('url'),
     FS = require("fs"),
-    myForm;
-
+    
     config = {
         url: 'https://erpdemo.emerge-it.co.uk',
         tabulaini: 'tabula.ini',
@@ -38,6 +37,7 @@ util.get('/', function (req, res) {
 
     var requestBody = '';
     var msg;
+    var curform;
 
     req.on('data', function (data) {
         requestBody += data;
@@ -48,22 +48,17 @@ util.get('/', function (req, res) {
         try {
             var apiResponse = log();
             var js = JSON.parse(requestBody);
+           
+            console.log(JSON.stringify(js, null, 2)); 
 
-            //console.log(JSON.stringify(js, null, 2)); 
-
-            priority.login(config).then(function () {
-                for (var key in js) {
-                    console.log("Open form %s.", key);
-                    priority.formStart(key, showMessage, updateFields).then(
-                        function (form) {
-                            myForm = form;
-                            for (var i in js[key]) {
-                                parseArray(js[key][i])
-                            }
-                            res.simpleJSON(200, { apiResponse });
-                        }
-                    );
-                };                
+            priority.login(config).then(() => {
+                var k = FormName(js);
+                priority.formStart(k, showMessage, updateFields, 1).then(curform => {
+                    curform = curform;
+                    iter(js[k], itertop, curform).then(() => {
+                        res.simpleJSON(200, { apiResponse });
+                    }).catch(err => { throw (err) })
+                }).catch(err => { throw (err) })
             });
 
         } catch (e) {
@@ -78,6 +73,122 @@ util.get('/', function (req, res) {
 
 });
 
+function FormName(Object) {
+    for (var key in Object) { return key }
+}
+
+var itertop = function (m, curform) {
+    return new Promise((resolve, reject) => {
+        iter(toArray(m), iterForm, curform).then(() => {
+            resolve();
+        }).catch(err => reject(err))
+    })
+};
+
+var iterForm = function (m, curform) {
+    return new Promise((resolve, reject) => {        
+        switch (typeof m.value) {
+            case "object":
+                curform.saveRow(0).then(() => {
+                    curform.startSubForm(m.name, showMessage, updateFields).then(curform => {
+                        iter(m.value, iterRow, curform).then(() => {
+                            curform.endCurrentForm().then(() => {
+                                resolve();
+                            }).catch(err => reject(err))
+                        }).catch(err => reject(err))
+                    }).catch(err => reject(err))
+                })
+                break;
+
+            default:
+                if (m.name.slice(0, 1) != "$") {
+                    curform.fieldUpdate(m.name, m.value).then(() => {
+                        resolve();
+                    }).catch(err => reject(err))
+                } else {resolve();}
+                break;
+
+        }        
+    })
+};
+
+var iterRow= function (m, curform) {
+    return new Promise((resolve, reject) => {
+        iter(toArray(m), iterForm, curform).then(() => {
+            resolve();
+        })
+    })
+}
+
+/* Iterate function */
+function iter(ar, fn, result) {
+    return new Promise((resolve, reject) => {
+        try {
+            var cntr = 0;
+            function next() {
+                if (cntr < ar.length) {
+                    ar[cntr].$index = cntr;
+                    fn(ar[cntr], result).then(() => {
+                        cntr++;
+                        next();
+
+                    }).catch(err => reject(err));
+
+                } else {
+                    resolve(result)
+
+                };
+            };
+            next();
+
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+function toArray(Object) {
+    var
+        a = [];    
+    for (var key in Object) {
+        switch (typeof Object[key]) {
+            case "object":
+                break;
+
+            default:
+                var i = {};
+                i.name = key;
+                i.value = Object[key]
+                a.push(i);        
+                break;
+        }        
+    }
+    for (var key in Object) {
+        switch (typeof Object[key]) {
+            case "object":
+                var i = {};
+                i.name = key;
+                i.value = Object[key]
+                a.push(i);
+                break;
+
+            default:
+                break;
+        }
+    }
+    return a;
+}
+
+function sortArray(Object) {
+    var
+        a = []
+        cntr = 0;
+        while (cntr < Object.length) {
+            a.push(toArray(Object[cntr]));
+            cntr++
+        }
+    return a;
+}
 function log() {
     var l = {};
     l.response = "200";
@@ -93,63 +204,6 @@ function apiError(Line, Message) {
     return e;
 }
 
-function parseArray(node) {
-    return new Promise((resolve, reject) => {
-        for (var key in node) {
-            switch (typeof node[key]) {
-                case "string":
-                    console.log("%s : %s", key, node[key]);
-                    if (key.slice(0, 1) != "$") {
-                        myForm.fieldUpdate(
-                            key,
-                            node[key],
-                            function () {
-
-                            },
-                            function () {
-
-                            }
-                        );
-                    };
-                    break;
-            };
-        };
-
-        myForm.saveRow(
-            0,
-            function () {
-
-            },
-            function () {
-
-            }
-        );
-
-        for (var key in node) {
-            switch (typeof node[key]) {
-                case "object":
-                    console.log("Open sub form %s.", key);
-                    myForm.startSubForm(
-                        key,
-                        showMessage,
-                        updateFields
-                    ).then(function (form) {
-                        Myform = form;
-                        for (var i in node[key]) {
-                            parseArray(node[key][i]).then(function () { }, function (message) { reject(message) });
-
-                        };
-                        console.log("Close sub form %s.", key);
-                        Myform.endCurrentForm();
-                    });
-                    break;
-            };
-        };
-        resolve();
-
-    })
-};
-
 var showMessage = function (message) {    
     if (message.type != "warning") {        
         console.log("%s", message.message);
@@ -160,10 +214,10 @@ var showMessage = function (message) {
 }
 
 function updateFields(result) {
-    if (result[myForm.name]) {
-        var fields = result[myForm.name][1];
-        for (var fieldName in fields) {
-            console.log("Update %s", fieldName)
-        }
-    }    
+    //if (result[myForm.name]) {
+    //    var fields = result[myForm.name][1];
+    //    for (var fieldName in fields) {
+    //        console.log("Update %s", fieldName)
+    //    }
+    //}    
 }

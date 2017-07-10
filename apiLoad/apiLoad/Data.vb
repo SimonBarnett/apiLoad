@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports System.Text
+Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public Class Data : Inherits List(Of priRow)
@@ -24,20 +25,30 @@ Public Class Data : Inherits List(Of priRow)
 #Region "Methods"
 
     Public Overrides Function toString() As String
-        Dim str As New Text.StringBuilder
-        With str
-            .Append("{ ")
-            .AppendFormat("""{0}"": [ ", rows(0).FormName)
-            For Each r As priRow In rows
-                .AppendFormat("{0}", r.toString)
-                If Not r.id = rows.Last.id Then
-                    .Append(", ")
-                End If
-            Next
-            .Append("] }")
+        Dim str As New StringBuilder
+        Dim sw As New StringWriter(str)
+        Using wr As New JsonTextWriter(sw)
 
-            Return .ToString
-        End With
+            'wr.WriteStartObject()
+            'wr.WritePropertyName("post")
+            'wr.WriteStartArray()
+            wr.WriteStartObject()
+
+            wr.WritePropertyName(rows(0).FormName)
+            wr.WriteStartArray()
+
+            For Each r As priRow In rows
+                wr.WriteStartObject()
+                r.toJson(wr)
+                wr.WriteEndObject()
+
+            Next
+            wr.WriteEndObject()
+
+        End Using
+
+        Return str.ToString
+
     End Function
 
     Public Function Post(ByRef Ex As Exception) As Boolean

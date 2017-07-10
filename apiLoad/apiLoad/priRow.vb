@@ -1,4 +1,6 @@
-﻿Public Class priRow : Inherits List(Of priRow) : Implements IDisposable
+﻿Imports Newtonsoft.Json
+
+Public Class priRow : Inherits List(Of priRow) : Implements IDisposable
 
     Private _Rowdata As New Dictionary(Of String, String)
     Private _Form As priForm
@@ -59,45 +61,36 @@
 
 #Region "Methods"
 
-    Public Overrides Function toString() As String
+    Public Sub toJson(ByRef wr As JsonTextWriter)
 
-        Dim str As New Text.StringBuilder
+        wr.WritePropertyName("$LN")
+        wr.WriteValue(Me.id)
 
-        str.Append("{ ")
-        str.AppendFormat("""{0}"" : ""{1}"" ", "$LN", Me.id)
         For Each colname As String In _Rowdata.Keys
-            str.AppendFormat(", ""{0}"" : ""{1}"" ", colname, RowData(colname))
-            'If Not String.Compare(_Rowdata.Keys.Last, colname, True) = 0 Then
-            '    str.AppendFormat("{0}", ", ")
-            'End If
+            wr.WritePropertyName(colname)
+            wr.WriteValue(RowData(colname))
         Next
 
-        Dim fn As String = String.Empty
         For Each sfk As String In _Form.Subforms.Keys
             Dim start As Boolean = False
             For Each row As priRow In Me
                 If String.Compare(row.FormName, sfk) = 0 Then
                     If Not start Then
                         start = True
-                        str.AppendFormat(", ""{0}"" : [", sfk)
-                        str.Append(row.toString)
-
-                    Else
-                        str.AppendFormat(", {0}", row.toString)
-
+                        wr.WritePropertyName(sfk)
+                        wr.WriteStartArray()
                     End If
+
+                    wr.WriteStartObject()
+                    row.toJson(wr)
+                    wr.WriteEndObject()
 
                 End If
             Next
-            If start Then str.Append("]")
-
+            If start Then wr.WriteEndArray()
         Next
 
-        str.Append("} ")
-
-        Return str.ToString
-
-    End Function
+    End Sub
 
 #End Region
 

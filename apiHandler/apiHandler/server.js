@@ -24,3 +24,6 @@ http.createServer(function (req, res) {
     handler(req, res);
 
 }).listen(PORT, HOST);
+
+var post = [];
+console.log(JSON.stringify(post, null, 2)); 

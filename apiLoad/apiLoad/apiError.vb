@@ -44,8 +44,14 @@ End Class
 Public Class apiError
 
     Sub New(Line, Message)
-        _Line = Line
-        _message = Message
+        Try
+            _Line = Line
+        Catch ex As Exception
+            _Line = 0
+        Finally
+            _message = Message
+        End Try
+
     End Sub
 
     Private _Line As Integer
