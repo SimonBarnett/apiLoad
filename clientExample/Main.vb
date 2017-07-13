@@ -26,9 +26,10 @@ Module Main
                         End With
 
                         With tasks
-                            .AddRow(r, "A Task", "28/03/17")
-                            .AddRow(r, "B Task", "17/05/17")
+                            .AddRow(r, "A Task", New Date(2017, 7, 13).ToUniversalTime.ToString)
+                            .AddRow(r, "B Task", New Date(2016, 5, 11).ToUniversalTime.ToString)
                         End With
+
 
                         Dim ex As New Exception
                         If Not cust.Post(ex) Then

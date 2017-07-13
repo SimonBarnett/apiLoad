@@ -1,4 +1,7 @@
-﻿var
+﻿Loading = require('./Loading');
+apiResult = require('./apiResult');
+
+var
     priority = require('priority-web-sdk'),
     qs = require('querystring'),
     url = require('url'),
@@ -33,6 +36,8 @@ util.not_found = function (req, res) {
     res.end(not_found_msg);
 };
 
+
+
 util.get('/', function (req, res) {
 
     var requestBody = '';
@@ -45,179 +50,159 @@ util.get('/', function (req, res) {
 
     req.on('end', function () {
 
-        try {
-            var apiResponse = log();
-            var js = JSON.parse(requestBody);
-           
-            console.log(JSON.stringify(js, null, 2)); 
-
-            priority.login(config).then(() => {
-                var k = FormName(js);
-                priority.formStart(k, showMessage, updateFields, 1).then(curform => {
-                    curform = curform;
-                    iter(js[k], itertop, curform).then(() => {
-                        res.simpleJSON(200, { apiResponse });
-                    }).catch(err => { throw (err) })
-                }).catch(err => { throw (err) })
-            });
-
-        } catch (e) {
-            apiResponse.response = 500;
-            apiResponse.message = "API error."
-            apiResponse.msgs.push(apiError(null, e.message));
-
-            res.simpleJSON(200, { apiResponse });
-        }
+        var ld = new Loading(null, JSON.parse(requestBody));
+        Login(ld, curform).then(() => {
+            res.simpleJSON(200, ld.log.toJSON)
+        }).catch(() => {
+            res.simpleJSON(200, ld.log.toJSON)
+            })        
 
     });
 
-});
-
-function FormName(Object) {
-    for (var key in Object) { return key }
-}
-
-var itertop = function (m, curform) {
-    return new Promise((resolve, reject) => {
-        iter(toArray(m), iterForm, curform).then(() => {
-            resolve();
-        }).catch(err => reject(err))
-    })
-};
-
-var iterForm = function (m, curform) {
-    return new Promise((resolve, reject) => {        
-        switch (typeof m.value) {
-            case "object":
-                curform.saveRow(0).then(() => {
-                    curform.startSubForm(m.name, showMessage, updateFields).then(curform => {
-                        iter(m.value, iterRow, curform).then(() => {
+    function Login(ld, curform) {
+        return new Promise((resolve, reject) => {
+            console.log("Connecting...");
+            priority.login(config).then(() => {
+                console.log("Opening form %s.", ld.name);
+                priority.formStart(ld.name, null, null, 1).then(curform => {
+                    curform.clearRows().then(() => {
+                        iter(ld.rows, iterRow, curform).then(curform => {
+                            console.log("Close form %s.", curform.name);
                             curform.endCurrentForm().then(() => {
-                                resolve();
+                                resolve()
+                            }).catch(err => { ld.log.setError(null, null, err); reject(err) })
+                        }).catch(err => { ld.log.setError(null, null, err); reject(err) })
+                    }).catch(err => { ld.log.setError(null, null, err); reject(err) })
+                }).catch(err => { ld.log.setError(null, null, err); reject(err) })
+            }).catch(err => { ld.log.setError(null, null, err); reject(err) })
+        })
+    }
+
+    var iterRow = function (m, curform) {
+        return new Promise((resolve, reject) => {
+            //var f = curform;
+            iter(m.columns, iterField, curform).then(curform => {
+                console.log("Saving form %s.", curform.name);
+                curform.saveRow(0).then(() => {
+                    iter(m.subLoadings, iterForm, curform).then(curform => {  
+                        if (m.$index < m.parent.rows.length-1) {
+                            console.log("New row in form %s.", curform.name);
+                            curform.newRow().then(() => {
+                                resolve(curform)
                             }).catch(err => reject(err))
+                        } else {
+                            resolve(curform)
+                        }
+                    }).catch(err => reject(err))
+                }).catch(err => reject(err))
+            }).catch(err => reject(err))                   
+        })
+    }
+
+    var iterForm = function (m, curform) {
+        return new Promise((resolve, reject) => {  
+            //var f = curform;      
+            console.log("Opening sub form %s.", m.name);
+            curform.startSubForm(m.name, null, null).then(curform => {
+                curform = curform;
+                console.log("New row in form %s.", curform.name);
+                curform.newRow().then(() => {
+                    iter(m.rows, iterRow, curform).then(curform => {
+                        console.log("Closing sub form %s.", curform.name);                        
+                        curform.endCurrentForm().then(() => {                                                        
+                            resolve(curform);
                         }).catch(err => reject(err))
                     }).catch(err => reject(err))
-                })
-                break;
-
-            default:
-                if (m.name.slice(0, 1) != "$") {
-                    curform.fieldUpdate(m.name, m.value).then(() => {
-                        resolve();
-                    }).catch(err => reject(err))
-                } else {resolve();}
-                break;
-
-        }        
-    })
-};
-
-var iterRow= function (m, curform) {
-    return new Promise((resolve, reject) => {
-        iter(toArray(m), iterForm, curform).then(() => {
-            resolve();
+                }).catch(err => reject(err))
+            }).catch(err => reject(err))        
         })
-    })
-}
+    };
 
-/* Iterate function */
-function iter(ar, fn, result) {
-    return new Promise((resolve, reject) => {
-        try {
-            var cntr = 0;
-            function next() {
-                if (cntr < ar.length) {
-                    ar[cntr].$index = cntr;
-                    fn(ar[cntr], result).then(() => {
-                        cntr++;
-                        next();
+    var iterField = function (m, curform) {
+        return new Promise((resolve, reject) => {   
+            //var f = curform;     
+            console.log("Set field %s = %s.", m.name, m.value);
+            curform.fieldUpdate(m.name, m.value).then(() => {
+                resolve(curform);
+            }).catch(err => reject(err))                   
+        })
+    }
 
-                    }).catch(err => reject(err));
-
-                } else {
-                    resolve(result)
-
+    /* Iterate function */
+    function iter(ar, fn, result) {
+        return new Promise((resolve, reject) => {    
+            try {                 
+                var cntr = 0;
+                function next() {
+                    if (cntr < ar.length) {
+                        ar[cntr].$index = cntr;                
+                        fn(ar[cntr], result).then(curform => {
+                            cntr++;
+                            next();
+                        }).catch(err => reject(err));
+                    } else {resolve(result)};
                 };
-            };
-            next();
-
-        } catch (e) {
-            reject(e)
-        }
-    })
-}
-
-function toArray(Object) {
-    var
-        a = [];    
-    for (var key in Object) {
-        switch (typeof Object[key]) {
-            case "object":
-                break;
-
-            default:
-                var i = {};
-                i.name = key;
-                i.value = Object[key]
-                a.push(i);        
-                break;
-        }        
+                next();        
+            } catch (err) { reject(err)}    
+        })
     }
-    for (var key in Object) {
-        switch (typeof Object[key]) {
-            case "object":
-                var i = {};
-                i.name = key;
-                i.value = Object[key]
-                a.push(i);
-                break;
 
-            default:
-                break;
-        }
-    }
-    return a;
-}
+});
 
-function sortArray(Object) {
-    var
-        a = []
-        cntr = 0;
-        while (cntr < Object.length) {
-            a.push(toArray(Object[cntr]));
-            cntr++
-        }
-    return a;
-}
-function log() {
-    var l = {};
-    l.response = "200";
-    l.message = "Ok";
-    l.msgs = [];
-    return l;
-}
+//    }).catch(err => {
+//        if (err.message == "Record already exists in form.") {
+//            SelectRow(curform, m.parent).then(() => {
+//                resolve();
+//            }).catch(err => reject(err))
+//        } else {
+//            reject(err)
+//        }
+//    })
 
-function apiError(Line, Message) {
-    var e = {};
-    e.line = Line;
-    e.message = Message;    
-    return e;
-}
+//function SelectRow(curform, m) {
+//    return new Promise((resolve, reject) => {
 
-var showMessage = function (message) {    
-    if (message.type != "warning") {        
-        console.log("%s", message.message);
+//        curform.undo().then(() => {
+//            var
+//                a = []
+//            cntr = 1;
 
-    } else {
-        message.form.warningConfirm(1);
-    }
-}
+//            for (var key in m) {
+//                switch (typeof m[key]) {
+//                    case "object":
+//                        break;
 
-function updateFields(result) {
-    //if (result[myForm.name]) {
-    //    var fields = result[myForm.name][1];
-    //    for (var fieldName in fields) {
-    //        console.log("Update %s", fieldName)
-    //    }
-    //}    
-}
+//                    default:
+//                        if (key.slice(0, 1) !== "$") {
+//                            var i = {};
+//                            i.name = key;
+//                            i.value = m[key]
+//                            a.push(i);
+//                            break;
+//                        }
+//                }
+//            }
+
+//            curform.getRows(1).then(rows => {
+//                while (rows[curform.name][cntr] !== undefined) {
+//                    var f = 1;
+//                    for (i in a) {
+//                        if (rows[cntr][a[i].name] !== a[i].value) {
+//                            f = 0;
+//                        }
+//                    }
+//                    if (f == 1) {
+//                        curform.setActiveRow(cntr).then(() => {
+//                            resolve();
+//                        })
+//                    } else { cntr++; }
+
+//                }
+//                resolve();
+
+//            }).catch(err => reject(err))
+
+//        }).catch(err => reject(err))
+
+//    })
+//}

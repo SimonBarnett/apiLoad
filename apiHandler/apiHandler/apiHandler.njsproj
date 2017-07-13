@@ -29,6 +29,12 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="apiResult.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Loading.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="server.js" />
     <Compile Include="util.js">
       <SubType>Code</SubType>
@@ -36,7 +42,11 @@
     <Content Include="Json.json">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Output.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="package.json" />
+    <Content Include="pri6.loaded.png" />
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>

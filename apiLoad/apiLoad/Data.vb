@@ -29,9 +29,6 @@ Public Class Data : Inherits List(Of priRow)
         Dim sw As New StringWriter(str)
         Using wr As New JsonTextWriter(sw)
 
-            'wr.WriteStartObject()
-            'wr.WritePropertyName("post")
-            'wr.WriteStartArray()
             wr.WriteStartObject()
 
             wr.WritePropertyName(rows(0).FormName)

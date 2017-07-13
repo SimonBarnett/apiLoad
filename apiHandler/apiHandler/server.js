@@ -4,7 +4,8 @@ HOST = '0.0.0.0';
 fs = require('fs'),
 url = require('url'),
 http = require('http'),
-util = require('./util');
+    util = require('./util');
+
 
 http.createServer(function (req, res) {
     var handler = util.getMap[url.parse(req.url).pathname] || util.not_found;
