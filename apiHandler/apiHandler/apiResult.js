@@ -32,10 +32,10 @@ class apiResult {
     }
 
     setError(response, message, e) {
-        console.log(e.message);
+        console.log(message);
         this.response = response || 500;
         this.message = message || "API error."
-        this.addError(null, e.message)
+        if (e!==undefined){ this.addError(null, e.message) }
     }
 
 }

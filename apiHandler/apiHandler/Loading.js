@@ -1,13 +1,40 @@
 ﻿apiResult = require('./apiResult');
 
-class Row {
+class baseob {
+    get log() {
+        return this.root().apiResult;
+    }
+    set log(val) {
+        this.root().apiResult = val;
+    }
+    root() {
+        var p = this
+        while (p.parent !== undefined) {
+            p = p.parent
+        }
+        return p;
+    }
+}
+
+class Row extends baseob {
     constructor(parent, line) {
+        super();
         this.line = line.$LN;
         this.parent = parent;        
         this.columns = [];
         this.subLoadings = [];
         this.read(line);
+        this.loaded = "N";
 
+    }
+
+    sucsess() {
+        this.loaded = "Y";
+    }
+
+    fail(e) {
+        this.log.addError(this.line, e.message);
+        this.log.setError(400, "Not all lines were loaded.")
     }
 
     read(Object) {
@@ -30,28 +57,14 @@ class Row {
         }
     }
 
-    get log() {
-        return this.root().apiResult;
-    }
-    set log(val) {
-        this.root().apiResult = val;
-    }
-
-    root() {
-        var p = this
-        while (p.parent !== undefined) {
-            p = p.parent
-        }
-        return p;
-    }
 }
 
-class Loading {
+class Loading extends baseob {
     constructor(parent, Object, name) {
-        
-        this.rows = [];        
+        super();
+        this.rows = [];
 
-        if (parent == undefined) {            
+        if (parent == undefined) {
             this.name = this.fn(Object);
             this.apiResult = new apiResult;
 
@@ -65,23 +78,7 @@ class Loading {
             for (var r in Object) {
                 this.rows.push(new Row(this, Object[r]))
             }
-        }        
-
-    }
-
-    get log() {
-        return this.root().apiResult;
-    }
-    set log(val) {
-        this.root().apiResult = val;
-    }
-
-    root() {
-        var p = this
-        while (p.parent !== undefined) {
-            p = p.parent
         }
-        return p;
     }
 
     fn(Object) {

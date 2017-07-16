@@ -80,10 +80,13 @@ util.get('/', function (req, res) {
 
     var iterRow = function (m, curform) {
         return new Promise((resolve, reject) => {
-            //var f = curform;
-            iter(m.columns, iterField, curform).then(curform => {
+             iter(m.columns, iterField, curform).then(curform => {
                 console.log("Saving form %s.", curform.name);
                 curform.saveRow(0).then(() => {
+                    var e = {};
+                    e.message = "test";
+                    m.fail(e);
+                    m.sucsess();
                     iter(m.subLoadings, iterForm, curform).then(curform => {  
                         if (m.$index < m.parent.rows.length-1) {
                             console.log("New row in form %s.", curform.name);
@@ -94,14 +97,16 @@ util.get('/', function (req, res) {
                             resolve(curform)
                         }
                     }).catch(err => reject(err))
-                }).catch(err => reject(err))
+                }).catch(err => {
+                    m.fail(err);
+                    resolve(curform);
+                })
             }).catch(err => reject(err))                   
         })
     }
 
     var iterForm = function (m, curform) {
         return new Promise((resolve, reject) => {  
-            //var f = curform;      
             console.log("Opening sub form %s.", m.name);
             curform.startSubForm(m.name, null, null).then(curform => {
                 curform = curform;
@@ -120,11 +125,18 @@ util.get('/', function (req, res) {
 
     var iterField = function (m, curform) {
         return new Promise((resolve, reject) => {   
-            //var f = curform;     
             console.log("Set field %s = %s.", m.name, m.value);
             curform.fieldUpdate(m.name, m.value).then(() => {
                 resolve(curform);
-            }).catch(err => reject(err))                   
+            }).catch(err => {
+                if (err.message == "Record already exists in form.") {
+                    SelectRow(m, curform).then(() => {
+                        resolve();
+                    }).catch(err => reject(err))
+                } else {
+                    reject(err)
+                }
+            })                
         })
     }
 
@@ -149,60 +161,28 @@ util.get('/', function (req, res) {
 
 });
 
-//    }).catch(err => {
-//        if (err.message == "Record already exists in form.") {
-//            SelectRow(curform, m.parent).then(() => {
-//                resolve();
-//            }).catch(err => reject(err))
-//        } else {
-//            reject(err)
-//        }
-//    })
+function SelectRow(m, curform) {
+    return new Promise((resolve, reject) => {
+        curform.undo().then(() => {
+            curform.getRows(1).then(rows => {
+                var cntr = 1;
+                while (rows[curform.name][cntr] !== undefined) {
+                    var f = 1;
+                    for (var i in parent.rows[m.$index].columns) {
+                        if (rows[cntr][parent.rows[m.$index].columns[i].name] !== parent.rows[m.$index].columns[i].value) {
+                            f = 0;
+                        }
+                    }
+                    if (f == 1) {
+                        curform.setActiveRow(cntr).then(() => {
+                            resolve();
+                        })
+                    } else { cntr++; }
 
-//function SelectRow(curform, m) {
-//    return new Promise((resolve, reject) => {
+                }
+                resolve();
 
-//        curform.undo().then(() => {
-//            var
-//                a = []
-//            cntr = 1;
-
-//            for (var key in m) {
-//                switch (typeof m[key]) {
-//                    case "object":
-//                        break;
-
-//                    default:
-//                        if (key.slice(0, 1) !== "$") {
-//                            var i = {};
-//                            i.name = key;
-//                            i.value = m[key]
-//                            a.push(i);
-//                            break;
-//                        }
-//                }
-//            }
-
-//            curform.getRows(1).then(rows => {
-//                while (rows[curform.name][cntr] !== undefined) {
-//                    var f = 1;
-//                    for (i in a) {
-//                        if (rows[cntr][a[i].name] !== a[i].value) {
-//                            f = 0;
-//                        }
-//                    }
-//                    if (f == 1) {
-//                        curform.setActiveRow(cntr).then(() => {
-//                            resolve();
-//                        })
-//                    } else { cntr++; }
-
-//                }
-//                resolve();
-
-//            }).catch(err => reject(err))
-
-//        }).catch(err => reject(err))
-
-//    })
-//}
+            }).catch(err => reject(err))
+        }).catch(err => reject(err))
+    })
+}
