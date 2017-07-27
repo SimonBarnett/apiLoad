@@ -35,11 +35,21 @@
     <Compile Include="Loading.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="priCN.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="priCredential.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="server.js" />
+    <Compile Include="junk.js" />
     <Compile Include="util.js">
       <SubType>Code</SubType>
     </Compile>
     <Content Include="Json.json">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="entity.json">
       <SubType>Code</SubType>
     </Content>
     <Content Include="Output.html">

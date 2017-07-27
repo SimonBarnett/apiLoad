@@ -7,22 +7,22 @@ Module Main
             Try
                 Using cust As New priForm("CUSTOMERS", "CUSTNAME", "CUSTDES")
                     With cust
-                        Dim contacts = .AddForm("CUSTPERSONNEL", "FIRSTNAME", "LASTNAME")
+                        Dim contacts = .AddForm("CUSTPERSONNEL", "NAME", "FIRM")
                         Dim tasks = .AddForm("CUSTNOTES", "SUBJECT", "CURDATE")
-                        Dim addy = contacts.AddForm("BILLTO", "ADDRESS", "ADDRESS2", "ADDRESS3", "ZIP")
+                        Dim addy = contacts.AddForm("BILLTO", "ADDRESS", "ADDRESS2", "ZIP")
 
                         Dim r As priRow = .AddRow("Cust0001", "Customer")
 
                         addy.AddRow(
                             contacts.AddRow(
-                                r, "Si", "B"
+                                r, "Si B", "Customer"
                             ),
-                            "49, Great Park", "", "Leyland", "pr253un"
+                            "49, Great Park", "Leyland", "pr25 3un"
                         )
 
                         With contacts
-                            .AddRow(r, "jo", "B")
-                            .AddRow(r, "Emilie", "B")
+                            .AddRow(r, "jo B", "Customer")
+                            .AddRow(r, "Emilie B", "Customer")
                         End With
 
                         With tasks
@@ -41,6 +41,7 @@ Module Main
                         End If
 
                     End With
+
                 End Using
 
             Catch ex As apiResponse ' Connected, but with errors.   

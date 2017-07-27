@@ -1,0 +1,15 @@
+﻿{
+  "entities": [
+    {
+      "name": "CUSTOMERS",
+      "keys": [ "CUSTNAME" ]
+    },
+    {
+      "name": "CUSTPERSONNEL",
+      "keys": [
+        "NAME",
+        "FIRM"
+      ]
+    }
+  ]
+}

@@ -57,6 +57,13 @@ class Row extends baseob {
         }
     }
 
+    value() {
+        var ret = {};
+        for (var i=0; i < this.columns.length; i++) {
+            ret[this.columns[i].name] = this.columns[i].value;
+        }
+        return ret;
+    }
 }
 
 class Loading extends baseob {
@@ -68,15 +75,15 @@ class Loading extends baseob {
             this.name = this.fn(Object);
             this.apiResult = new apiResult;
 
-            for (var r in Object[this.name]) {
-                this.rows.push(new Row(this, Object[this.name][r]))
+            for (var k = 0; k < Object[this.name].length; k++) {
+                this.rows.push(new Row(this, Object[this.name][k]))
             }
 
         } else {
             this.parent = parent;
             this.name = name;
-            for (var r in Object) {
-                this.rows.push(new Row(this, Object[r]))
+            for (var k = 0; k < Object.length; k++) {            
+                this.rows.push(new Row(this, Object[k]))
             }
         }
     }

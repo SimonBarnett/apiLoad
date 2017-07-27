@@ -1,49 +1,45 @@
 ﻿{
-  "post": [
+  "CUSTOMERS": [
     {
-      "CUSTOMERS": [
+      "$LN": 1,
+      "CUSTNAME": "Cust0001",
+      "CUSTDES": "Customer",
+      "CUSTPERSONNEL": [
         {
-          "$LN": 1,
-          "CUSTNAME": "Cust0001",
-          "CUSTDES": "Customer",
-          "CUSTPERSONNEL": [
+          "$LN": 2,
+          "FIRSTNAME": "Si",
+          "LASTNAME": "B",
+          "BILLTO": [
             {
-              "$LN": 2,
-              "FIRSTNAME": "Si",
-              "LASTNAME": "B",
-              "BILLTO": [
-                {
-                  "$LN": 3,
-                  "ADDRESS": "49, Great Park",
-                  "ADDRESS2": "",
-                  "ADDRESS3": "Leyland",
-                  "ZIP": "pr253un"
-                }
-              ]
-            },
-            {
-              "$LN": 4,
-              "FIRSTNAME": "jo",
-              "LASTNAME": "B"
-            },
-            {
-              "$LN": 5,
-              "FIRSTNAME": "Emilie",
-              "LASTNAME": "B"
-            }
-          ],
-          "CUSTNOTES": [
-            {
-              "$LN": 6,
-              "SUBJECT": "A Task",
-              "CURDATE": "28/03/17"
-            },
-            {
-              "$LN": 7,
-              "SUBJECT": "B Task",
-              "CURDATE": "17/05/17"
+              "$LN": 3,
+              "ADDRESS": "49, Great Park",
+              "ADDRESS2": "",
+              "ADDRESS3": "Leyland",
+              "ZIP": "pr253un"
             }
           ]
+        },
+        {
+          "$LN": 4,
+          "FIRSTNAME": "jo",
+          "LASTNAME": "B"
+        },
+        {
+          "$LN": 5,
+          "FIRSTNAME": "Emilie",
+          "LASTNAME": "B"
+        }
+      ],
+      "CUSTNOTES": [
+        {
+          "$LN": 6,
+          "SUBJECT": "A Task",
+          "CURDATE": "12/07/2017 23:00:00"
+        },
+        {
+          "$LN": 7,
+          "SUBJECT": "B Task",
+          "CURDATE": "10/05/2016 23:00:00"
         }
       ]
     }
