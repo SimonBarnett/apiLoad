@@ -1,5 +1,13 @@
-﻿querystring = require('querystring');
+﻿/**
+    Medatech JS oData Client
+    si@medatechuk.com
+    August 2017
+*/
+
+querystring = require('querystring');
 priCredential = require('./priCredential');
+fiddler = require("./fiddler");
+parseString = require('xml2js').parseString;
 
 // Base REST object
 class restBase {
@@ -8,7 +16,9 @@ class restBase {
         this.Data = '';
         this.query = '';
         this.orderby = '';
+        this.retries = 0;
     }
+
     get postData() { return this.Data };
     set postData(value) { this.Data = value };
 
@@ -29,7 +39,9 @@ class restBase {
         return new Promise((resolve, reject) => {
             const lib = (this.cn.secure == 1) ? require('https') : require('http');
             const req = lib.request(
-                this.cn.options(this),
+                /*fiddler.setProxy(*/
+                this.cn.options(this)
+                /*)*/,
                 (res) => {
                     res.setEncoding('utf8');
 
@@ -43,11 +55,8 @@ class restBase {
 
                     res.on('end', (res) => {
                         console.log("Server said [{0}]: {1}".f(resp.statusCode, resp.statusMessage));
-                        if (resp.statusCode < 200 || resp.statusCode > 299) {
-                            var er = {};
-                            er["message"] = "Server said [{0}]...{1}".f(resp.statusCode, resp.statusMessage);
-                            reject(er);
-
+                        if (resp.statusCode < 200 || resp.statusCode > 299) {                            
+                            this.erMsg(resp, result.join('')).then(er => { reject(er); })                            
                         } else {
                             resolve(JSON.parse(result.join('')));
                         }
@@ -65,6 +74,54 @@ class restBase {
             req.end();
 
         });
+    }
+    /**
+     * Read the *ahem* xml result
+     */
+    erMsg(resp, body) {
+        return new Promise((resolve, reject) => {
+            var er = {};
+            er["response"] = resp;
+
+            if (resp.statusCode == 400) {
+                parseString(body, function (err, result) {
+                    er["message"] = result.FORM.InterfaceErrors[0].text[0];
+                    resolve(er);
+                });
+
+            } else {
+                er["message"] = "Server said [{0}]...{1}".f(resp.statusCode, resp.statusMessage);
+                resolve(er);
+
+            }
+            
+        })
+    }
+    /**
+     * Retry 3 times if a request times out.
+    */
+    retry() {
+        return new Promise((resolve, reject) => {
+            var r = 1;
+            this.get().then(result => {
+                resolve(result);
+            }).catch(er => {                
+                if (er.response != undefined) { r = 0}
+                if (!er.code == "ETIMEDOUT") { r = 0 } else { this.retries++; }
+                if (this.retries == 3) { r = 0 }
+                if (r == 1) {
+                    console.log("Timed out. Retrying...");
+                    this.retry().then(result => { resolve(result) }).catch(er => { reject(er) });
+                } else {
+                    if (er.code == "ETIMEDOUT"){ 
+                        er.message = "Timed out after 3 attempts."
+                        er.response = {};
+                        er.response.statusCode = 0;
+                    }
+                    reject(er);
+                }
+            })
+        })
     }
 }
 
@@ -131,6 +188,11 @@ class entity {
         this.selected = "{0}{1}".f(ret, ")");
 
     }
+    clearSelection() {
+        console.log("Clear selection.")
+        this.row = {};
+        this.selected = "";        
+    }
     url() {
         return "{0}{1}{2}".f(this.name, this.subform, this.selected);
     }
@@ -164,12 +226,25 @@ class entity {
         for (var k = 0; k < Object.keys(rowData).length; k++) {
             var columnName = Object.keys(rowData)[k];
             // Don't update keys.
-            if (!this.keys.contains(columnName)) {
+            if (this.keys) {
+                if (!this.keys.contains(columnName)) {
+                    // Don't update same data.                
+                    if (this.row[columnName] !== rowData[columnName]) {
+                        ret.push("{0}:'{1}'".f(columnName, rowData[columnName]));
+                    }
+                };
+            } else {                
                 // Don't update same data.                
-                if (this.row[columnName] !== rowData[columnName]) {
-                    ret.push("{0}:'{1}'".f(columnName, rowData[columnName]));
+                if (this.row) {
+                    if (this.row[columnName] !== rowData[columnName]) {
+                        ret.push("{0}:'{1}'".f(columnName, rowData[columnName]));
+                    }                
+                } else {                    
+                    ret.push("{0}:'{1}'".f(columnName, rowData[columnName]));                    
                 }
-            };
+
+            }
+
         }
         return "{{0}}".f(ret.join(','));
     }
@@ -177,10 +252,27 @@ class entity {
         var ret = [];
         for (var k = 0; k < Object.keys(rowData).length; k++) {
             var columnName = Object.keys(rowData)[k];
-            ret.push("{0}:'{1}'".f(columnName, rowData[columnName]));
+            if (rowData[columnName].slice(0, 1) == "#") {
+                ret.push("{0}:{1}".f(columnName, rowData[columnName].slice(1)));
+            } else {
+                ret.push("{0}:'{1}'".f(columnName, rowData[columnName]));
+            }
         }
         return "{{0}}".f(ret.join(','));
     }
+    resultKeys(result) {
+        var ret = [];
+        if (this.keys){ 
+            for (var k = 0; k < this.keys.length; k++) {
+                var columnName = this.keys[k];
+                var i = {};
+                i[columnName] = result[columnName];
+                ret.push(i);
+            }
+        }
+        return ret;
+    }
+
 }
 
 // Exported Class
@@ -218,7 +310,6 @@ class priCN {
         }
         return "{0}?{1}".f(url, request.queryString());
     }
-    
     options(request) {
         var reqURL = this.currentUrl(request);
         var ret = {
@@ -246,33 +337,32 @@ class priCN {
         console.log("Closing form %s.", this.entityList[this.entityList.length - 1].name);
         this.entityList.splice(this.entityList.length -1, 1)
     }
-
     editOrInsert(rowData) {
         return new Promise((resolve, reject) => {
             if (!this.lastEntity.hasKeys()) {
-                this.edit(this.lastEntity.postInsert(rowData)).then(result => {
-                    resolve(result);
+                this.insert(rowData).then(result => {
+                    resolve(this.lastEntity.resultKeys(result))
                 }).catch(er => { reject(er) });
 
             } else {
                 if (this.lastEntity.hasKeys(rowData)) {
                     this.exists(rowData).then(ex => {
                         if (ex) {
-                            this.edit(this.lastEntity.postEdit(rowData)).then(result => {
-                                resolve(result);
+                            this.edit(rowData).then(result => {
+                                resolve(this.lastEntity.resultKeys(result))
                             }).catch(er => { reject(er) });
 
                         } else {
-                            this.insert(this.lastEntity.postInsert(rowData)).then(result => {
-                                resolve(result)
+                            this.insert(rowData).then(result => {
+                                resolve(this.lastEntity.resultKeys(result))
                             }).catch(er => { reject(er) });
 
                         }
                     }).catch(er => { reject(er) });
 
                 } else {
-                    this.insert(this.lastEntity.postInsert(rowData)).then(result => {
-                        resolve(result)
+                    this.insert(rowData).then(result => {
+                        resolve(this.lastEntity.resultKeys(result))
                     }).catch(er => { reject(er) });
 
                 }
@@ -280,25 +370,35 @@ class priCN {
             }
         }
     )}
-
-    insert(postData) {
+    insert(rowData) {
         return new Promise((resolve, reject) => {
             // New row.
             var g = new restPost(this)
-            g.postData = postData;
-            g.get().then(result => {
+            g.postData = this.lastEntity.postInsert(rowData);
+            g.retry().then(result => {
                 this.lastEntity.select(result);
                 resolve(result);
-            }).catch(er => { reject(er) });
+            }).catch(er => {
+                if (er.response.statusCode == 409) {
+                    this.edit(rowData).then(result => {
+                        resolve(result);
+                    }).catch(er => {
+                        reject(er)
+                    })
+
+                } else {
+                    reject(er)
+                }
+            });
         });
     }
-
-    edit(postData) {
+    edit(rowData) {
         return new Promise((resolve, reject) => {
+            var postData = this.lastEntity.postEdit(rowData);
             if (postData != "{}") {
                 var g = new restPatch(this);
                 g.postData = postData;
-                g.get().then(result => {
+                g.retry().then(result => {
                     this.lastEntity.select(result);
                     resolve(result);
                 }).catch(er => { reject(er) });
@@ -309,12 +409,11 @@ class priCN {
             }
         });
     }
-
     exists(rowData) {
         return new Promise((resolve, reject) => {
             var g = new restGet(this);
             g.filter = this.lastEntity.filter(rowData)
-            g.get().then(result => {
+            g.retry().then(result => {
                 if (result.value.length > 0) {
                     this.lastEntity.select(result.value[0]);
                     resolve(true);

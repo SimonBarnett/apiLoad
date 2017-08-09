@@ -32,6 +32,9 @@
     <Compile Include="apiResult.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="fiddler.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Loading.js">
       <SubType>Code</SubType>
     </Compile>

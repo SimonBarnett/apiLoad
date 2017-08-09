@@ -18,7 +18,7 @@ class apiResult {
         result.apiResponse.response = this.response;
         result.apiResponse.message = this.message;
         result.apiResponse.msgs = [];
-        for (var i in this.msgs) {
+        for (var i = 0; i < this.msgs.length; i++) {        
             var m = {};
             m.line = this.msgs[i].line || "0";
             m.message = this.msgs[i].message;

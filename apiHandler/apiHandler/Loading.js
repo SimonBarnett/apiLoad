@@ -28,8 +28,9 @@ class Row extends baseob {
 
     }
 
-    sucsess() {
+    sucsess(e) {
         this.loaded = "Y";
+        this.resultKeys = e;
     }
 
     fail(e) {

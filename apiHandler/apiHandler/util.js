@@ -72,8 +72,9 @@ util.get('/', function (req, res) {
             iterRow = function (m, cn) {
                 return new Promise((resolve, reject) => {
                     cn.editOrInsert(m.value()).then(result => {
-                        m.sucsess();
+                        m.sucsess(result);
                         iter(m.subLoadings, iterForm, cn).then(cn => {
+                            cn.lastEntity.clearSelection();
                             resolve(cn);
                         }).catch(err => reject(err))
 
