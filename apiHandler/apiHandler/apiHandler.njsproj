@@ -13,7 +13,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e3a49171-c965-4b3b-8b7d-d97fed78a1df</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>install.js</StartupFile>
+    <StartupFile>server.js</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -65,7 +65,9 @@
     </Content>
     <Content Include="package.json" />
     <Content Include="pri6.loaded.png" />
-    <Content Include="README.md" />
+    <Content Include="..\..\apiLoad\README.md">
+      <Link>README.md</Link>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="typings\" />
