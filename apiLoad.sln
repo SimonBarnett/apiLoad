@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "apiLoad", "apiLoad\apiLoad.vbproj", "{9148F0F9-EB8D-4FE6-832E-E3BBFA139708}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "apiHandler", "..\apiHandler\apiHandler\apiHandler.njsproj", "{E3A49171-C965-4B3B-8B7D-D97FED78A1DF}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "apiHandler", "apiHandler\apiHandler.njsproj", "{E3A49171-C965-4B3B-8B7D-D97FED78A1DF}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "clientExample", "..\clientExample\clientExample.vbproj", "{3512E438-8D22-4047-88F6-EBA349F2989F}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "clientExample", "clientExample\clientExample.vbproj", "{3512E438-8D22-4047-88F6-EBA349F2989F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{627A3730-4695-421D-89CF-26943062A7B7}"
+	ProjectSection(SolutionItems) = preProject
+		readme.md = readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
