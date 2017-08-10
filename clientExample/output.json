@@ -7,39 +7,53 @@
       "CUSTPERSONNEL": [
         {
           "$LN": 2,
-          "FIRSTNAME": "Si",
-          "LASTNAME": "B",
+          "NAME": "Si B",
+          "FIRM": "Customer",
+          "EMAIL": "si@ntsa.org.uk",
           "BILLTO": [
             {
               "$LN": 3,
-              "ADDRESS": "49, Great Park",
-              "ADDRESS2": "",
-              "ADDRESS3": "Leyland",
-              "ZIP": "pr253un"
+              "ADDRESS": "48 Great Park",
+              "ADDRESS2": "Leyland",
+              "ZIP": "pr25 3un"
             }
           ]
         },
         {
           "$LN": 4,
-          "FIRSTNAME": "jo",
-          "LASTNAME": "B"
+          "NAME": "jo B",
+          "FIRM": "Customer",
+          "EMAIL": "jo@ntsa.org.uk",
+          "BILLTO": [
+            {
+              "$LN": 5,
+              "ADDRESS": "49 Great Park",
+              "ADDRESS2": "Leyland",
+              "ZIP": "pr25 3un"
+            }
+          ]
         },
         {
-          "$LN": 5,
-          "FIRSTNAME": "Emilie",
-          "LASTNAME": "B"
+          "$LN": 6,
+          "NAME": "Emilie B",
+          "FIRM": "Customer",
+          "EMAIL": ""
         }
       ],
       "CUSTNOTES": [
         {
-          "$LN": 6,
+          "$LN": 7,
           "SUBJECT": "A Task",
-          "CURDATE": "12/07/2017 23:00:00"
+          "CURDATE": "2017-08-28T00:00Z",
+          "STIME": "10:00",
+          "ETIME": "12:00"
         },
         {
-          "$LN": 7,
+          "$LN": 8,
           "SUBJECT": "B Task",
-          "CURDATE": "10/05/2016 23:00:00"
+          "CURDATE": "2017-08-29T00:00Z",
+          "STIME": "12:00",
+          "ETIME": "11:00"
         }
       ]
     }

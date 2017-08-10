@@ -38,8 +38,7 @@ util.get('/', function (req, res) {
                 "https://erpdemo.emerge-it.co.uk",
                 "demo",
                 new priCredential("apiuser", "123456")
-            ),
-            m = new Loading(null, JSON.parse(requestBody));
+            ),            
 
             iter = function (ar, fn, result) {
                 return new Promise((resolve, reject) => {
@@ -84,15 +83,25 @@ util.get('/', function (req, res) {
                     })
                 })
             };
+        
+        try {
+            var m = new Loading(null, JSON.parse(requestBody));
+            iterForm(m, cn).then(() => {
+                res.simpleJSON(200, m.log.toJSON);
 
-        iterForm(m, cn).then(() => {
-            res.simpleJSON(200, m.log.toJSON);
+            }).catch(er => {
+                console.log(er);
+                res.simpleJSON(200, m.log.toJSON);
 
-        }).catch(er => {
-            console.log(er);
-            res.simpleJSON(200, m.log.toJSON);
-
-        });
+            });
+        }
+        catch (e) {
+            var result = {};
+            result.apiResponse = {};
+            result.apiResponse.response = "400";
+            result.apiResponse.message = "Invalid data.";
+            res.simpleJSON(400, result);
+        }        
 
     });
 
