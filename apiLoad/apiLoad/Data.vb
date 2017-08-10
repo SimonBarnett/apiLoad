@@ -68,6 +68,7 @@ Public Class Data : Inherits List(Of priRow)
                 Net.HttpWebRequest
             )
 
+            uploadRequest.Timeout = 5 * 60 * 1000
             uploadRequest.Method = "POST"
             uploadRequest.Proxy = Nothing
             uploadRequest.SendChunked = True

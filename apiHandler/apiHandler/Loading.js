@@ -23,14 +23,11 @@ class Row extends baseob {
         this.parent = parent;        
         this.columns = [];
         this.subLoadings = [];
-        this.read(line);
-        this.loaded = "N";
-
+        this.read(line);        
     }
 
-    sucsess(e) {
-        this.loaded = "Y";
-        this.resultKeys = e;
+    sucsess(e) {        
+        this.log.addSucsess(this.line, e);
     }
 
     fail(e) {

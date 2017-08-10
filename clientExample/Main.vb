@@ -36,25 +36,23 @@ Module Main
                             .AddRow(r, "B Task", "2017-08-29T00:00Z", "12:00", "11:00") ', "08/08/17") 'DateDiff(DateInterval.Minute, #1/1/1988#, Now())) 'New Date(2016, 5, 11).ToUniversalTime.ToString)
                         End With
 
-
-                        Dim ex As New Exception
-                        If Not cust.Post(ex) Then
-                            Console.WriteLine(cust.toString)
-                            Throw ex
-                        Else
-                            Console.WriteLine("Posted.")
-
-                        End If
-
                     End With
 
-                End Using
+                    Dim ex As Exception = Nothing
+                    cust.Post(ex)
+                    If Not TypeOf ex Is apiResponse Then
+                        Throw (ex)
+                    Else
+                        With TryCast(ex, apiResponse)
+                            Console.WriteLine("{0}: {1}", .response, .message)
+                            For Each msg As apiError In .msgs
+                                Console.WriteLine("  {0}", msg.toString)
+                            Next
+                        End With
 
-            Catch ex As apiResponse ' Connected, but with errors.   
-                Console.WriteLine("{0}: {1}", ex.response, ex.message)
-                For Each msg As apiError In ex.msgs
-                    Console.WriteLine("  Ln {0}: {1}", msg.Line, msg.message)
-                Next
+                    End If
+
+                End Using
 
             Catch ex As Exception ' Didn't connect                
                 Console.WriteLine(ex.Message)

@@ -1,8 +1,15 @@
 ﻿class apiError {
-    constructor(line, message) {
+    constructor(line, loaded) {
         this.line = line;
-        this.message = message;
+        this.loaded = loaded;    
     }
+
+    get message() { return this._message };
+    set message(value) { this._message = value};
+
+    get resultKeys() { return this._resultKeys };
+    set resultKeys(value) { this._resultKeys = value };
+
 }
 
 class apiResult {
@@ -20,22 +27,36 @@ class apiResult {
         result.apiResponse.msgs = [];
         for (var i = 0; i < this.msgs.length; i++) {        
             var m = {};
-            m.line = this.msgs[i].line || "0";
-            m.message = this.msgs[i].message;
+            m.line = this.msgs[i].line;
+            m.loaded = this.msgs[i].loaded;
+            if (this.msgs[i].message) {
+                m.message = this.msgs[i].message;
+            }
+            if (this.msgs[i].resultKeys) {
+                m.resultKeys = this.msgs[i].resultKeys;
+            }
+
             result.apiResponse.msgs.push(m);
         }
         return result;
     }
 
     addError(line, message) {
-        this.msgs.push(new apiError(line, message));
+        var er = new apiError(line, "N");
+        er.message = message;
+        this.msgs.push(er);
     }
 
-    setError(response, message, e) {
+    addSucsess(line, resultKeys) {
+        var er = new apiError(line, "Y");
+        er.resultKeys = resultKeys;
+        this.msgs.push(er);
+    }
+
+    setError(response, message) {
         console.log(message);
         this.response = response || 500;
         this.message = message || "API error."
-        if (e!==undefined){ this.addError(null, e.message) }
     }
 
 }
