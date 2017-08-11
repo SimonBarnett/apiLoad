@@ -15,7 +15,7 @@ This Postman example sends data to the demo server at erpdemo.emerge-it.co.uk.
 <h2>Installation.</h2>
 The handler is installed as a Windows Service using the <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/install.js">installation script</a>.
 ```
-c:\>node C:\inetpub\mobile6\install.js
+node C:\inetpub\mobile6\install.js
 ```
 
 <h2>Configuration.</h2>
