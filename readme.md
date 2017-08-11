@@ -1,5 +1,5 @@
 <h1>Summary.</h1>
-This solution contains a NodeJS service to perform Priority Loadings and a .net client which accesses the service.
+This solution contains a <a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiHandler">NodeJS Windows service</a> which performs Priority Loadings and a <a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiLoad">.net client</a> which accesses the service.
 
 <h1>Solution Projects.</h1>
 <h2><a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiHandler">API Handler</a></h2>
