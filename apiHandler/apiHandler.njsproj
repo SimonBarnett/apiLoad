@@ -59,15 +59,13 @@
     <Content Include="entity.json">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="README.md" />
     <None Include="LocalWeb.pubxml" />
     <Content Include="Output.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="package.json" />
     <Content Include="pri6.loaded.png" />
-    <Content Include="..\..\apiLoad\README.md">
-      <Link>README.md</Link>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="typings\" />

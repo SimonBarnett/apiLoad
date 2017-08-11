@@ -109,9 +109,10 @@
     </None>
     <None Include="App.config" />
     <None Include="output.json" />
+    <None Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\apiLoad\apiLoad\apiLoad.vbproj">
+    <ProjectReference Include="..\apiLoad\apiLoad.vbproj">
       <Project>{9148f0f9-eb8d-4fe6-832e-e3bbfa139708}</Project>
       <Name>apiLoad</Name>
     </ProjectReference>
