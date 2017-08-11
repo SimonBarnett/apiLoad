@@ -7,25 +7,25 @@ This <a href="https://github.com/SimonBarnett/apiLoad/blob/master/clientExample/
 
 Defining a form and its columns:
 
-```
+```Visual Basic
 Dim form As New priForm("{FORMNAME}", "{COLUMN1}", "{COLUMN2}", ...)
 ```
 
 Add Subforms to the definition:
 
-```
+```Visual Basic
 Dim subform = form.AddForm("{SUBFORMNAME}", "{COLUMN1}", "{COLUMN2}", ...)
 ```
 
 Adding rows to the loading:
 
-```
+```Visual Basic
 Dim r As priRow = form.AddRow("{COLUMN1_DATA}", "{COLUMN2_DATA}", ...)
 ```
 
 Posting the loading to the server:
 
-```
+```Visual Basic
 Dim ex As Exception = Nothing
 form.Post(ex)
 If Not TypeOf ex Is apiResponse Then
