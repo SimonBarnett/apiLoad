@@ -28,15 +28,23 @@ Posting the loading to the server:
 ```Visual Basic
 Dim ex As Exception = Nothing
 form.Post(ex)
-If Not TypeOf ex Is apiResponse Then
-    Throw (ex)
-Else
-    With TryCast(ex, apiResponse)
-        Console.WriteLine("{0}: {1}", .response, .message)
-        For Each msg As apiError In .msgs
-            Console.WriteLine("  {0}", msg.toString)
-        Next
-    End With
+If Not TypeOf ex Is apiResponse Then Throw (ex)
+```
 
-End If
+Handling the server <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiLoad/apiError.vb">response</a>:
+
+```
+With TryCast(ex, apiResponse)
+    Console.WriteLine("{0}: {1}", .response, .message)
+    For Each msg As apiError In .msgs		
+        Console.WriteLine("  Ln {0}: {1}", msg.Line, msg.Loaded.ToString)
+		If Loaded Then        
+            For Each k As String In msg.resultKeys.Keys
+                ' Contains key namepairs
+            Next            
+        Else
+            ' Contains msg.message
+        End If
+    Next
+End With
 ```
