@@ -1,2 +1,2 @@
 <h2>Summary.</h2>
-This dotNet library is used by the <a href="https://github.com/SimonBarnett/apiLoad/tree/master/clientExample">.Net Client Example</a> to generate <a href="https://github.com/SimonBarnett/apiLoad/blob/master/clientExample/output.json">JSON data</a> that is sent to the <a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiHandler">API Handler</a>.
+This dotNet library is used by the <a href="https://github.com/SimonBarnett/apiLoad/tree/master/clientExample">.Net Client Example</a> to generate the <a href="https://github.com/SimonBarnett/apiLoad/blob/master/clientExample/output.json">JSON data</a> and send it to the <a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiHandler">API Handler</a>.
