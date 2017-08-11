@@ -5,6 +5,9 @@ The handler service accepts <a href="https://github.com/SimonBarnett/apiLoad/blo
 Data received by the service is passed into a <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/Loading.js">Loading</a> structure.
 The <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/util.js">http handler</a> iterates through the Loading structure issuing oData commands using an <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/priCN.js">oData Client</a>.
 
+<h2>Postman example.</h2>
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/29b5ed9ca3ca6f69aee1)
+
 <h2>Installation.</h2>
 The handler is installed as a Windows Service using the <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/install.js">installation script</a>.
 
