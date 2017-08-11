@@ -1,7 +1,7 @@
 <h1>.Net Client Example</h1>
 
 <h2>Summary.</h2>
-This example demonstrates usage of the <a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiLoad">.Net API Load Library</a>.
+This <a href="https://github.com/SimonBarnett/apiLoad/blob/master/clientExample/Main.vb">example</a> demonstrates usage of the <a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiLoad">.Net API Load Library</a>.
 
 <h2>Usage.</h2>
 
