@@ -28,7 +28,7 @@ Module Main
                         )
 
                         With contacts
-                            .AddRow(r, "Emilie B", "Customer", "")
+                            .AddRow(r, "Emilie B", "Customer", Nothing)
                         End With
 
                         With tasks
@@ -39,18 +39,15 @@ Module Main
                     End With
 
                     Dim ex As Exception = Nothing
-                    cust.Post(ex)
-                    If Not TypeOf ex Is apiResponse Then
-                        Throw (ex)
-                    Else
-                        With TryCast(ex, apiResponse)
-                            Console.WriteLine("{0}: {1}", .response, .message)
-                            For Each msg As apiError In .msgs
-                                Console.WriteLine("  {0}", msg.toString)
-                            Next
-                        End With
+                    cust.Post(ex, New Uri("http://localhost:8080/demo"))
+                    If Not TypeOf ex Is apiResponse Then Throw (ex)
 
-                    End If
+                    With TryCast(ex, apiResponse)
+                        Console.WriteLine("{0}: {1}", .response, .message)
+                        For Each msg As apiError In .msgs
+                            Console.WriteLine("  {0}", msg.toString)
+                        Next
+                    End With
 
                 End Using
 

@@ -23,11 +23,11 @@ Adding rows to the loading:
 Dim r As priRow = form.AddRow("{COLUMN1_DATA}", "{COLUMN2_DATA}", ...)
 ```
 
-Posting the loading to the server:
+Posting the loading to the ://server/{priority_company}:
 
 ```Visual Basic
 Dim ex As Exception = Nothing
-form.Post(ex)
+Post(ex, New Uri("http://localhost:8080/demo"))
 If Not TypeOf ex Is apiResponse Then Throw (ex)
 ```
 

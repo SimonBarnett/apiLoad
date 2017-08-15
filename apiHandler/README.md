@@ -21,3 +21,24 @@ node C:\inetpub\mobile6\install.js
 
 <h2>Configuration.</h2>
 The <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/priCN.js">oData Client</a> requires the <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/entity.json">entity.json file</a>, containing the list of keys for entities used by loadings.
+
+The <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/util.js">util.js</a> needs a handler for each Priority company that accepts data.
+
+```JavaScript
+util.get('/demo2', function (req, res) {
+
+    var requestBody = '';
+    req.on('data', function (data) {
+        requestBody += data;
+    });
+    req.on('end', function () {
+        parse(
+            new priCN(url, "demo2", credential),
+            requestBody,
+            res
+        )
+    });
+
+});
+
+```

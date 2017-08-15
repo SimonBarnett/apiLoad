@@ -88,9 +88,45 @@
         End If
 
     End Function
+    Public Function Post(ByRef ex As Exception, Optional ByVal Env As String = "", Optional Port As Integer = 8080) As Boolean
+        Dim uploadRequest As Net.HttpWebRequest = CType(
+        Net.HttpWebRequest.Create(
+            String.Format(
+                "http://localhost:{0}/{1}",
+                Port.ToString,
+                Env
+            )
+        ),
+        Net.HttpWebRequest
+    )
+        Return rows.Post(ex, uploadRequest)
+    End Function
 
-    Public Function Post(ByRef Ex As Exception) As Boolean
-        Return rows.Post(Ex)
+    Public Function Post(ByRef ex As Exception, Optional ByVal host As Uri = Nothing) As Boolean
+
+        Dim prot As String
+        Select Case host.Scheme
+            Case Uri.UriSchemeHttp
+                prot = "http"
+            Case Uri.UriSchemeHttps
+                prot = "https"
+            Case Else
+                Throw New UriFormatException
+        End Select
+
+        Dim uploadRequest As Net.HttpWebRequest = CType(
+            Net.HttpWebRequest.Create(
+                String.Format(
+                    "{0}://{1}:{2}/{3}",
+                    prot,
+                    host.Host,
+                    host.Port.ToString(),
+                    Split(host.AbsolutePath, "/")(1)
+                )
+            ),
+            Net.HttpWebRequest
+        )
+        Return rows.Post(ex, uploadRequest)
 
     End Function
 

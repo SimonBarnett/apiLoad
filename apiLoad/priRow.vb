@@ -67,8 +67,10 @@ Public Class priRow : Inherits List(Of priRow) : Implements IDisposable
         wr.WriteValue(Me.id)
 
         For Each colname As String In _Rowdata.Keys
-            wr.WritePropertyName(colname)
-            wr.WriteValue(RowData(colname))
+            If Not RowData(colname) Is Nothing Then
+                wr.WritePropertyName(colname)
+                wr.WriteValue(RowData(colname))
+            End If
         Next
 
         For Each sfk As String In _Form.Subforms.Keys

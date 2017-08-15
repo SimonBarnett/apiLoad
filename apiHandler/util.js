@@ -2,44 +2,13 @@
     Loading = require('./Loading'),
     apiResult = require('./apiResult'),
     priCredential = require('./priCredential'),
-    priCN = require('./priCN');
+    priCN = require('./priCN'),
 
-util = exports;
+    url = "https://erpdemo.emerge-it.co.uk",
+    credential = new priCredential("apiuser", "123456"),
 
-util.getMap = [];
-
-util.get = function (path, handler) {
-    util.getMap[path] = handler;
-};
-
-util.not_found = function (req, res) {
-    var not_found_msg = 'Not Found';
-
-    res.writeHead(404, {
-        'Content-Type': 'text/plain',
-        'Content-Length': not_found_msg.length
-    });
-    res.end(not_found_msg);
-};
-
-util.get('/', function (req, res) {
-
-    var requestBody = '';
-    var msg;
-    var curform;
-
-    req.on('data', function (data) {
-        requestBody += data;
-    });
-
-    req.on('end', function () {
-        var            
-            cn = new priCN(
-                "https://erpdemo.emerge-it.co.uk",
-                "demo",
-                new priCredential("apiuser", "123456")
-            ),            
-
+    parse = function (cn, requestBody, res) {
+        var
             iter = function (ar, fn, result) {
                 return new Promise((resolve, reject) => {
                     try {
@@ -83,7 +52,7 @@ util.get('/', function (req, res) {
                     })
                 })
             };
-        
+
         try {
             var m = new Loading(null, JSON.parse(requestBody));
             iterForm(m, cn).then(() => {
@@ -101,8 +70,72 @@ util.get('/', function (req, res) {
             result.apiResponse.response = "400";
             result.apiResponse.message = "Invalid data.";
             res.simpleJSON(400, result);
-        }        
+        }
 
+    };
+
+util = exports;
+
+util.getMap = [];
+
+util.get = function (path, handler) {
+    util.getMap[path] = handler;
+};
+
+util.not_found = function (req, res) {
+    var not_found_msg = 'Invalid Priority Company.';
+
+    res.writeHead(404, {
+        'Content-Type': 'text/plain',
+        'Content-Length': not_found_msg.length
+    });
+    res.end(not_found_msg);
+};
+
+util.get('/', function (req, res) {
+
+    var requestBody = '';
+    req.on('data', function (data) {
+        requestBody += data;
+    });
+    req.on('end', function () {
+        parse(
+            new priCN(url, "demo", credential),
+            requestBody,
+            res
+        )
+    });
+
+});
+
+util.get('/demo', function (req, res) {
+
+    var requestBody = '';
+    req.on('data', function (data) {
+        requestBody += data;
+    });
+    req.on('end', function () {
+        parse(
+            new priCN(url, "demo", credential),
+            requestBody,
+            res
+        )
+    });
+
+});
+
+util.get('/demo2', function (req, res) {
+
+    var requestBody = '';
+    req.on('data', function (data) {
+        requestBody += data;
+    });
+    req.on('end', function () {
+        parse(
+            new priCN(url, "demo2", credential),
+            requestBody,
+            res
+        )
     });
 
 });

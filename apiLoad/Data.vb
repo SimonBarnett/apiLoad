@@ -48,7 +48,7 @@ Public Class Data : Inherits List(Of priRow)
 
     End Function
 
-    Public Function Post(ByRef Ex As Exception) As Boolean
+    Public Function Post(ByRef Ex As Exception, uploadRequest As Net.HttpWebRequest) As Boolean
 
         Dim posted As Boolean = False
         Dim uploadResponse As Net.HttpWebResponse = Nothing
@@ -58,15 +58,6 @@ Public Class Data : Inherits List(Of priRow)
         Try
 
             Dim ms As MemoryStream = New MemoryStream(toByte)
-            Dim uploadRequest As Net.HttpWebRequest = CType(
-                Net.HttpWebRequest.Create(
-                    String.Format(
-                        "http://localhost:{0}",
-                        thisport.ToString
-                    )
-                ),
-                Net.HttpWebRequest
-            )
 
             uploadRequest.Timeout = 5 * 60 * 1000
             uploadRequest.Method = "POST"
