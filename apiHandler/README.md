@@ -20,7 +20,7 @@ node C:\inetpub\mobile6\install.js
 ```
 
 <h2>Configuration.</h2>
-The <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/server.js">server</a> can be set to listen on 0.0.0.0 to allow external connections, or on 127.0.0.1, to only accept requests from the local machine.<br>
+The <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/server.js">server</a> can be set to listen on 0.0.0.0 to allow external connections, or on 127.0.0.1, to only accept requests from the local machine.<br><br>
 
 The <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/priCN.js">oData Client</a> requires the <a href="https://github.com/SimonBarnett/apiLoad/blob/master/apiHandler/entity.json">entity.json file</a>, containing the list of keys for entities used by loadings.
 
