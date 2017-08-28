@@ -1,7 +1,9 @@
 <h1>Summary.</h1>
 This solution contains a <a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiHandler">NodeJS Windows service</a> which performs Priority Loadings and a <a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiLoad">.net client</a> which generates the <a href="https://github.com/SimonBarnett/apiLoad/blob/master/clientExample/output.json">JSON data</a> that is sent to the service.
 
-<br><a href="https://www.getpostman.com/run-collection/29b5ed9ca3ca6f69aee1" target="_blank"><img src="https://run.pstmn.io/button.svg" alt="Run in Postman"></a>
+This service is required to process oData requests from the <a href="https://github.com/SimonBarnett/api">IIS API</a>.
+
+<br><a href="https://app.getpostman.com/run-collection/4594feb31a8a5b1aa40c" target="_blank"><img src="https://run.pstmn.io/button.svg" alt="Run in Postman"></a>
 
 <h1>Solution Projects.</h1>
 <h2><a href="https://github.com/SimonBarnett/apiLoad/tree/master/apiHandler">API Handler</a></h2>
