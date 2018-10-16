@@ -1,5 +1,3 @@
-PORT = 8080;
-HOST = '0.0.0.0';
 
 fs = require('fs'),
 url = require('url'),
@@ -16,9 +14,11 @@ Array.prototype.contains = function (obj) {
     return false;
 };
 
+var settings = require('./settings.json');
+
+
 http.createServer(function (req, res) {
     var handler = util.getMap[url.parse(req.url).pathname] || util.not_found;
-
     res.simpleJSON = function (code, obj) {
         var body = JSON.stringify(obj);
         res.writeHead(code, {
@@ -31,9 +31,9 @@ http.createServer(function (req, res) {
 
     };
 
-    handler(req, res);
+    handler(url.parse(req.url).pathname.slice(1), req, res);
 
-}).listen(PORT, HOST);
+}).listen(settings.port, settings.host);
 
 console.log("Started.");
 

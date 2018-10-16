@@ -14,6 +14,18 @@
     {
       "name": "CUSTNOTES",
       "keys": [ "CUSTNOTE" ]
+    },
+    {
+      "name": "ORDERS",
+      "keys": [ "ORDNAME" ]
+    },
+    {
+      "name": "ORDERITEMS",
+      "keys": [ "CHARGEIV", "KLINE" ]
+    },
+    {
+      "name": "DOCUMENTS_p",
+      "keys": ["DOCNO", "TYPE"]
     }
   ]
 }

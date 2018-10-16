@@ -39,6 +39,7 @@ Module Main
                     End With
 
                     Dim ex As Exception = Nothing
+                    Console.Write(cust.toString)
                     cust.Post(ex, New Uri("http://localhost:8080/demo"))
                     If Not TypeOf ex Is apiResponse Then Throw (ex)
 

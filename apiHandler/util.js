@@ -3,9 +3,7 @@
     apiResult = require('./apiResult'),
     priCredential = require('./priCredential'),
     priCN = require('./priCN'),
-
-    url = "https://erpdemo.emerge-it.co.uk",
-    credential = new priCredential("apiuser", "123456"),
+    settings = require('./settings.json');
 
     parse = function (cn, requestBody, res) {
         var
@@ -82,7 +80,7 @@ util.get = function (path, handler) {
     util.getMap[path] = handler;
 };
 
-util.not_found = function (req, res) {
+util.not_found = function (co, req, res) {
     var not_found_msg = 'Invalid Priority Company.';
 
     res.writeHead(404, {
@@ -92,50 +90,40 @@ util.not_found = function (req, res) {
     res.end(not_found_msg);
 };
 
-util.get('/', function (req, res) {
 
-    var requestBody = '';
-    req.on('data', function (data) {
-        requestBody += data;
-    });
-    req.on('end', function () {
-        parse(
-            new priCN(url, "demo", credential),
-            requestBody,
-            res
-        )
-    });
+util.get("/", function (co, req, res) {
+    var not_found_msg = 'Invalid Priority Company.';
 
+    res.writeHead(200, {
+        'Content-Type': 'text/plain',
+        'Content-Length': not_found_msg.length
+    });
+    res.end(not_found_msg);
 });
 
-util.get('/demo', function (req, res) {
+for (var i = 0, len = settings.env.length; i < len; i++) {    
+    util.get("/" + settings.env[i], function (co, req, res) {
 
-    var requestBody = '';
-    req.on('data', function (data) {
-        requestBody += data;
+        var requestBody = '';
+        req.on('data', function (data) {
+            requestBody += data;
+        });
+        req.on('end', function () {
+            parse(
+                new priCN(
+                    settings.url,
+                    co,
+                    new priCredential(
+                        settings.user,
+                        settings.pass
+                    )
+                ),
+                requestBody,
+                res
+            )
+        });
+
     });
-    req.on('end', function () {
-        parse(
-            new priCN(url, "demo", credential),
-            requestBody,
-            res
-        )
-    });
+};
 
-});
 
-util.get('/demo2', function (req, res) {
-
-    var requestBody = '';
-    req.on('data', function (data) {
-        requestBody += data;
-    });
-    req.on('end', function () {
-        parse(
-            new priCN(url, "demo2", credential),
-            requestBody,
-            res
-        )
-    });
-
-});
